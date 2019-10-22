@@ -34,6 +34,13 @@ export function create(options) {
     offset: 0, // ms
 
     /** @type {number} Contains the timeout for the next synchronization */
+    /**
+     * @type {array}
+     * This property used to store all offsets
+     */
+    offsets: [],
+
+    /** @type {number} Contains the timeout for the next synchronization */
     _timeout: null,
 
     /** @type {Object.<string, function>} Contains a map with requests in progress */
@@ -205,6 +212,10 @@ export function create(options) {
             // calculate the limit for outliers
             var roundtrips = results.map(result => result.roundtrip);
             var limit = stat.median(roundtrips) + stat.std(roundtrips);
+
+            timesync.offsets = timesync.offsets.concat(
+              results.map(result => result.offset)
+            )
 
             // filter all results which have a roundtrip smaller than the mean+std
             var filtered = results.filter(result => result.roundtrip < limit);
